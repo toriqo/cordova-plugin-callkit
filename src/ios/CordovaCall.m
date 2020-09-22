@@ -6,7 +6,7 @@
 
 @synthesize VoIPPushCallbackId, VoIPPushClassName, VoIPPushMethodName;
 
-BOOL hasVideo = NO;
+BOOL hasVideo = YES;
 NSString* appName;
 NSString* ringtone;
 NSString* icon;
@@ -16,6 +16,8 @@ NSDictionary* pendingCallFromRecents;
 BOOL monitorAudioRouteChange = NO;
 BOOL enableDTMF = NO;
 PKPushRegistry *_voipRegistry;
+
+NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
 
 - (void)pluginInitialize
 {
@@ -50,6 +52,19 @@ PKPushRegistry *_voipRegistry;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveCallFromRecents:) name:@"RecentsCallNotification" object:nil];
     //detect Audio Route Changes to make speakerOn and speakerOff event handlers
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAudioRouteChange:) name:AVAudioSessionRouteChangeNotification object:nil];
+    
+    // Initialize PKPushRegistry
+    //http://stackoverflow.com/questions/27245808/implement-pushkit-and-test-in-development-behavior/28562124#28562124
+    dispatch_queue_t mainQueue = dispatch_get_main_queue();
+    // Create a push registry object
+    _voipRegistry = [[PKPushRegistry alloc] initWithQueue: mainQueue];
+    // Set the registry's delegate to self
+    [_voipRegistry setDelegate:(id<PKPushRegistryDelegate> _Nullable)self];
+    // Set the push type to VoIP
+    _voipRegistry.desiredPushTypes = [NSSet setWithObject:PKPushTypeVoIP];
+    
+    // Read VoIPPushToken from UserDefaults
+    self.VoIPPushToken = [[NSUserDefaults standardUserDefaults] stringForKey:KEY_VOIP_PUSH_TOKEN];
 }
 
 // CallKit - Interface
@@ -174,7 +189,6 @@ PKPushRegistry *_voipRegistry;
 - (void)receiveCall:(CDVInvokedUrlCommand*)command
 {
     BOOL hasId = ![[command.arguments objectAtIndex:1] isEqual:[NSNull null]];
-    CDVPluginResult* pluginResult = nil;
     NSString* callName = [command.arguments objectAtIndex:0];
     NSString* callId = hasId?[command.arguments objectAtIndex:1]:callName;
     NSUUID *callUUID = [[NSUUID alloc] init];
@@ -542,15 +556,22 @@ PKPushRegistry *_voipRegistry;
 {
     self.VoIPPushCallbackId = command.callbackId;
     NSLog(@"[objC] callbackId: %@", self.VoIPPushCallbackId);
+    
+    [self sendTokenPluginResult];
+}
 
-    //http://stackoverflow.com/questions/27245808/implement-pushkit-and-test-in-development-behavior/28562124#28562124
-    dispatch_queue_t mainQueue = dispatch_get_main_queue();
-    // Create a push registry object
-    _voipRegistry = [[PKPushRegistry alloc] initWithQueue: mainQueue];
-    // Set the registry's delegate to self
-    [_voipRegistry setDelegate:(id<PKPushRegistryDelegate> _Nullable)self];
-    // Set the push type to VoIP
-    _voipRegistry.desiredPushTypes = [NSSet setWithObject:PKPushTypeVoIP];
+- (void)sendTokenPluginResult {
+    if (!self.VoIPPushCallbackId || !self.VoIPPushToken) {
+        return;
+    }
+
+    NSMutableDictionary* results = [NSMutableDictionary dictionaryWithCapacity:2];
+    [results setObject:self.VoIPPushToken forKey:@"deviceToken"];
+    [results setObject:@"true" forKey:@"registration"];
+    
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:results];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.VoIPPushCallbackId];
 }
 
 #define PushKit Delegate Methods
@@ -563,18 +584,15 @@ PKPushRegistry *_voipRegistry;
     //http://stackoverflow.com/a/9372848/534755
     NSLog(@"[objC] Device token: %@", credentials.token);
     const unsigned *tokenBytes = [credentials.token bytes];
-    NSString *sToken = [NSString stringWithFormat:@"%08x%08x%08x%08x%08x%08x%08x%08x",
+    self.VoIPPushToken = [NSString stringWithFormat:@"%08x%08x%08x%08x%08x%08x%08x%08x",
                          ntohl(tokenBytes[0]), ntohl(tokenBytes[1]), ntohl(tokenBytes[2]),
                          ntohl(tokenBytes[3]), ntohl(tokenBytes[4]), ntohl(tokenBytes[5]),
                          ntohl(tokenBytes[6]), ntohl(tokenBytes[7])];
-
-    NSMutableDictionary* results = [NSMutableDictionary dictionaryWithCapacity:2];
-    [results setObject:sToken forKey:@"deviceToken"];
-    [results setObject:@"true" forKey:@"registration"];
     
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:results];
-    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]]; //[pluginResult setKeepCallbackAsBool:YES];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.VoIPPushCallbackId];
+    // Store VoIPPushToken in UserDefaults
+    [[NSUserDefaults standardUserDefaults] setObject:self.VoIPPushToken forKey:KEY_VOIP_PUSH_TOKEN];
+    
+    [self sendTokenPluginResult];
 }
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(PKPushType)type withCompletionHandler:(void (^)(void))completion
 {
