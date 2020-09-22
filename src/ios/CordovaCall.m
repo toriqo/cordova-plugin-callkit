@@ -17,6 +17,8 @@ BOOL monitorAudioRouteChange = NO;
 BOOL enableDTMF = NO;
 PKPushRegistry *_voipRegistry;
 
+NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
+
 - (void)pluginInitialize
 {
     CXProviderConfiguration *providerConfiguration;
@@ -60,6 +62,9 @@ PKPushRegistry *_voipRegistry;
     [_voipRegistry setDelegate:(id<PKPushRegistryDelegate> _Nullable)self];
     // Set the push type to VoIP
     _voipRegistry.desiredPushTypes = [NSSet setWithObject:PKPushTypeVoIP];
+    
+    // Read VoIPPushToken from UserDefaults
+    self.VoIPPushToken = [[NSUserDefaults standardUserDefaults] stringForKey:KEY_VOIP_PUSH_TOKEN];
 }
 
 // CallKit - Interface
@@ -583,7 +588,10 @@ PKPushRegistry *_voipRegistry;
                          ntohl(tokenBytes[0]), ntohl(tokenBytes[1]), ntohl(tokenBytes[2]),
                          ntohl(tokenBytes[3]), ntohl(tokenBytes[4]), ntohl(tokenBytes[5]),
                          ntohl(tokenBytes[6]), ntohl(tokenBytes[7])];
-
+    
+    // Store VoIPPushToken in UserDefaults
+    [[NSUserDefaults standardUserDefaults] setObject:self.VoIPPushToken forKey:KEY_VOIP_PUSH_TOKEN];
+    
     [self sendTokenPluginResult];
 }
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(PKPushType)type withCompletionHandler:(void (^)(void))completion
