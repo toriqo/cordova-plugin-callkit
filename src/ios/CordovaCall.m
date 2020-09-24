@@ -11,7 +11,7 @@ NSString* appName;
 NSString* ringtone;
 NSString* icon;
 BOOL includeInRecents = NO;
-NSMutableDictionary *callbackIds;
+NSMutableDictionary<NSString*, NSMutableArray*> *callbackIds;
 NSDictionary* pendingCallFromRecents;
 BOOL monitorAudioRouteChange = NO;
 BOOL enableDTMF = NO;
@@ -510,7 +510,7 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
 {
     [self setupAudioSession];
     [action fulfill];
-    if ([callbackIds[@"answer"] isEmpty]) {
+    if ([callbackIds[@"answer"] count] == 0) {
         // callbackId for event not registered, add to pending to trigger on registration
         [pendingCallResponses addObject:PENDING_RESPONSE_ANSWER];
     } else {
@@ -531,7 +531,7 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
                 [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
             }
         } else {
-            if ([callbackIds[@"reject"] isEmpty]) {
+            if ([callbackIds[@"reject"] count] == 0) {
                 // callbackId for event not registered, add to pending to trigger on registration
                 [pendingCallResponses addObject:PENDING_RESPONSE_REJECT];
             } else {
