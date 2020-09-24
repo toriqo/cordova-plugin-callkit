@@ -17,6 +17,10 @@ BOOL monitorAudioRouteChange = NO;
 BOOL enableDTMF = NO;
 PKPushRegistry *_voipRegistry;
 
+NSMutableArray* pendingCallResponses;
+NSString* const PENDING_RESPONSE_ANSWER = @"pendingResponseAnswer";
+NSString* const PENDING_RESPONSE_REJECT = @"pendingResponseReject";
+
 NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
 
 - (void)pluginInitialize
@@ -48,6 +52,10 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
     [callbackIds setObject:[NSMutableArray array] forKey:@"speakerOn"];
     [callbackIds setObject:[NSMutableArray array] forKey:@"speakerOff"];
     [callbackIds setObject:[NSMutableArray array] forKey:@"DTMF"];
+    
+    // Add call response (answer or reject) to pending if event listeners are not added at the time of responding
+    pendingCallResponses = [NSMutableArray new];
+    
     //allows user to make call from recents
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveCallFromRecents:) name:@"RecentsCallNotification" object:nil];
     //detect Audio Route Changes to make speakerOn and speakerOff event handlers
@@ -308,6 +316,16 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
         [pluginResult setKeepCallbackAsBool:YES];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
+    
+    // In case of registerEvent answer or reject called after responding to call, trigger cordova event for the appropriate answer
+    if ([eventName isEqualToString:@"answer"] && [pendingCallResponses containsObject:PENDING_RESPONSE_ANSWER]) {
+        [self triggerCordovaEventForCallResponse:@"answer"];
+        [pendingCallResponses removeObject:PENDING_RESPONSE_ANSWER];
+    }
+    if ([eventName isEqualToString:@"reject"] && [pendingCallResponses containsObject:PENDING_RESPONSE_REJECT]) {
+        [self triggerCordovaEventForCallResponse:@"reject"];
+        [pendingCallResponses removeObject:PENDING_RESPONSE_REJECT];
+    }
 }
 
 - (void)mute:(CDVInvokedUrlCommand*)command
@@ -492,11 +510,11 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
 {
     [self setupAudioSession];
     [action fulfill];
-    for (id callbackId in callbackIds[@"answer"]) {
-        CDVPluginResult* pluginResult = nil;
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"answer event called successfully"];
-        [pluginResult setKeepCallbackAsBool:YES];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+    if ([callbackIds[@"answer"] isEmpty]) {
+        // callbackId for event not registered, add to pending to trigger on registration
+        [pendingCallResponses addObject:PENDING_RESPONSE_ANSWER];
+    } else {
+        [self triggerCordovaEventForCallResponse:@"answer"];
     }
     //[action fail];
 }
@@ -513,17 +531,35 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
                 [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
             }
         } else {
-            for (id callbackId in callbackIds[@"reject"]) {
-                CDVPluginResult* pluginResult = nil;
-                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"reject event called successfully"];
-                [pluginResult setKeepCallbackAsBool:YES];
-                [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+            if ([callbackIds[@"reject"] isEmpty]) {
+                // callbackId for event not registered, add to pending to trigger on registration
+                [pendingCallResponses addObject:PENDING_RESPONSE_REJECT];
+            } else {
+                [self triggerCordovaEventForCallResponse:@"reject"];
             }
         }
     }
     monitorAudioRouteChange = NO;
     [action fulfill];
     //[action fail];
+}
+
+- (void)triggerCordovaEventForCallResponse:(NSString*) response {
+    if ([response isEqualToString:@"answer"]) {
+        for (id callbackId in callbackIds[@"answer"]) {
+            CDVPluginResult* pluginResult = nil;
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"answer event called successfully"];
+            [pluginResult setKeepCallbackAsBool:YES];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+        }
+    } else if ([response isEqualToString:@"reject"]) {
+        for (id callbackId in callbackIds[@"reject"]) {
+            CDVPluginResult* pluginResult = nil;
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"reject event called successfully"];
+            [pluginResult setKeepCallbackAsBool:YES];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+        }
+    }
 }
 
 - (void)provider:(CXProvider *)provider performSetMutedCallAction:(CXSetMutedCallAction *)action
