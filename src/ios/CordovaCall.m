@@ -17,7 +17,7 @@ BOOL monitorAudioRouteChange = NO;
 BOOL enableDTMF = NO;
 PKPushRegistry *_voipRegistry;
 
-NSMutableArray* pendingCallResponces;
+NSMutableArray* pendingCallResponses;
 NSString* const PENDING_RESPONSE_ANSWER = @"pendingResponseAnswer";
 NSString* const PENDING_RESPONSE_REJECT = @"pendingResponseReject";
 
@@ -54,7 +54,7 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
     [callbackIds setObject:[NSMutableArray array] forKey:@"DTMF"];
     
     // Add call response (answer or reject) to pending if event listeners are not added at the time of responding
-    pendingCallResponces = [NSMutableArray new];
+    pendingCallResponses = [NSMutableArray new];
     
     //allows user to make call from recents
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveCallFromRecents:) name:@"RecentsCallNotification" object:nil];
@@ -318,13 +318,13 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
     }
     
     // In case of registerEvent answer or reject called after responding to call, trigger cordova event for the appropriate answer
-    if ([eventName isEqualToString:@"answer"] && [pendingCallResponces containsObject:PENDING_RESPONSE_ANSWER]) {
+    if ([eventName isEqualToString:@"answer"] && [pendingCallResponses containsObject:PENDING_RESPONSE_ANSWER]) {
         [self triggerCordovaEventForCallResponse:@"answer"];
-        [pendingCallResponces removeObject:PENDING_RESPONSE_ANSWER];
+        [pendingCallResponses removeObject:PENDING_RESPONSE_ANSWER];
     }
-    if ([eventName isEqualToString:@"reject"] && [pendingCallResponces containsObject:PENDING_RESPONSE_REJECT]) {
+    if ([eventName isEqualToString:@"reject"] && [pendingCallResponses containsObject:PENDING_RESPONSE_REJECT]) {
         [self triggerCordovaEventForCallResponse:@"reject"];
-        [pendingCallResponces removeObject:PENDING_RESPONSE_REJECT];
+        [pendingCallResponses removeObject:PENDING_RESPONSE_REJECT];
     }
 }
 
@@ -512,7 +512,7 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
     [action fulfill];
     if ([callbackIds[@"answer"] isEmpty]) {
         // callbackId for event not registered, add to pending to trigger on registration
-        [pendingCallResponces addObject:PENDING_RESPONSE_ANSWER];
+        [pendingCallResponses addObject:PENDING_RESPONSE_ANSWER];
     } else {
         [self triggerCordovaEventForCallResponse:@"answer"];
     }
@@ -533,7 +533,7 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
         } else {
             if ([callbackIds[@"reject"] isEmpty]) {
                 // callbackId for event not registered, add to pending to trigger on registration
-                [pendingCallResponces addObject:PENDING_RESPONSE_REJECT];
+                [pendingCallResponses addObject:PENDING_RESPONSE_REJECT];
             } else {
                 [self triggerCordovaEventForCallResponse:@"reject"];
             }
