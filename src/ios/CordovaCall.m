@@ -514,6 +514,7 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
 
 - (void)provider:(CXProvider *)provider performAnswerCallAction:(CXAnswerCallAction *)action
 {
+    isRinging = NO;
     [self setupAudioSession];
     [action fulfill];
     if ([callbackIds[@"answer"] count] == 0) {
@@ -527,6 +528,7 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
 
 - (void)provider:(CXProvider *)provider performEndCallAction:(CXEndCallAction *)action
 {
+    isRinging = NO;
     NSArray<CXCall *> *calls = self.callController.callObserver.calls;
     if([calls count] == 1) {
         if(calls[0].hasConnected) {
