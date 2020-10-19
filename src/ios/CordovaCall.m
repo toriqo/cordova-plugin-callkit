@@ -10,7 +10,7 @@ BOOL hasVideo = YES;
 NSString* appName;
 NSString* ringtone;
 NSString* icon;
-BOOL includeInRecents = NO;
+BOOL includeInRecents = YES;
 NSMutableDictionary<NSString*, NSMutableArray*> *callbackIds;
 NSDictionary* pendingCallFromRecents;
 BOOL monitorAudioRouteChange = NO;
