@@ -654,6 +654,7 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
     [results setObject:@"" forKey:@"extra"];
 
     NSObject* caller = [data objectForKey:@"Caller"];
+    hasVideo = [caller valueForKey:@"Video"];
     NSArray* args = [NSArray arrayWithObjects:[caller valueForKey:@"Username"], [caller valueForKey:@"ConnectionId"], nil];
     CDVInvokedUrlCommand* newCommand = [[CDVInvokedUrlCommand alloc] initWithArguments:args callbackId:@"" className:self.VoIPPushClassName methodName:self.VoIPPushMethodName];
     
