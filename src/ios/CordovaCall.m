@@ -36,7 +36,7 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
     providerConfiguration.supportedHandleTypes = handleTypes;
     providerConfiguration.supportsVideo = YES;
     if (@available(iOS 11.0, *)) {
-        providerConfiguration.includesCallsInRecents = NO;
+        providerConfiguration.includesCallsInRecents = YES;
     }
     self.provider = [[CXProvider alloc] initWithConfiguration:providerConfiguration];
     [self.provider setDelegate:self queue:nil];
@@ -106,6 +106,10 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
 {
     @try {
       AVAudioSession *sessionInstance = [AVAudioSession sharedInstance];
+        // mix with others
+//        [sessionInstance setCategory:AVAudioSessionCategoryPlayAndRecord
+//                         withOptions:AVAudioSessionCategoryOptionMixWithOthers |
+//         AVAudioSessionCategoryOptionDefaultToSpeaker error:nil]
       [sessionInstance setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
       [sessionInstance setMode:AVAudioSessionModeVoiceChat error:nil];
       NSTimeInterval bufferDuration = .005;
