@@ -9,7 +9,6 @@
     static dispatch_once_t onceToken;
     
     dispatch_once(&onceToken, ^{
-        [self swizzleMethod:@selector(application:openURL:options:)];
         [self swizzleMethod:@selector(application:continueUserActivity:restorationHandler:)];
     });
 }
