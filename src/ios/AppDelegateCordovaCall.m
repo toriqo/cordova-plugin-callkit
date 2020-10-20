@@ -39,9 +39,7 @@
     INIntent *intent = interaction.intent;
     BOOL isVideo = [intent isKindOfClass:[INStartVideoCallIntent class]];
     INPerson *contact;
-    NSLog(@"%@", contact);
-    NSLog(isVideo ? @"YES" : @"NO");
-    NSLog(@"%@", intent);
+    
     if(isVideo) {
         INStartVideoCallIntent *startCallIntent = (INStartVideoCallIntent *)intent;
         contact = startCallIntent.contacts.firstObject;
