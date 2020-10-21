@@ -400,13 +400,13 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
 - (void)callNumber:(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult* pluginResult = nil;
-    NSString* jid = [command.arguments objectAtIndex:0];
-    NSString* identifier = [@"tel://" stringByAppendingString:jid];
+    NSString* phoneNumber = [command.arguments objectAtIndex:0];
+    NSString* telNumber = [@"tel://" stringByAppendingString:phoneNumber];
     if (@available(iOS 10.0, *)) {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:identifier]
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:telNumber]
                                            options:@{}
                                  completionHandler:^(BOOL success) {
-            if (success) {
+            if(success) {
                 CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Call Successful"];
                 [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
             } else {
@@ -415,7 +415,7 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
             }
         }];
     } else {
-        BOOL success = [[UIApplication sharedApplication] openURL:[NSURL URLWithString:identifier]];
+        BOOL success = [[UIApplication sharedApplication] openURL:[NSURL URLWithString:telNumber]];
         if(success) {
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Call Successful"];
         } else {
