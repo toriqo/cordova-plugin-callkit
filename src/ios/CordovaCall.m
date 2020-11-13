@@ -562,14 +562,16 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
     if ([response isEqualToString:@"answer"]) {
         for (id callbackId in callbackIds[@"answer"]) {
             CDVPluginResult* pluginResult = nil;
-            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"answer event called successfully"];
+            NSString *response = [NSString stringWithFormat:@"{response: 'answer event called successfully', user: '%@', connectionId: '%@', notificationId: '%@'}", user, connectionId, notificationId];
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:response];
             [pluginResult setKeepCallbackAsBool:YES];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
         }
     } else if ([response isEqualToString:@"reject"]) {
         for (id callbackId in callbackIds[@"reject"]) {
             CDVPluginResult* pluginResult = nil;
-            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"reject event called successfully"];
+            NSString *response = [NSString stringWithFormat:@"{response: 'reject event called successfully', user: '%@', connectionId: '%@', notificationId: '%@'}", user, connectionId, notificationId];
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:response];
             [pluginResult setKeepCallbackAsBool:YES];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
         }
