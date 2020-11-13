@@ -562,7 +562,7 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
     if ([response isEqualToString:@"answer"]) {
         for (id callbackId in callbackIds[@"answer"]) {
             CDVPluginResult* pluginResult = nil;
-            NSString *response = [NSString stringWithFormat:@"{response: 'answer event called successfully', user: '%@', connectionId: '%@', notificationId: '%@'}", user, connectionId, notificationId];
+            NSString *response = [NSString stringWithFormat:@"{\"response\": \"answer event called successfully\", \"user\": \"%@\", \"connectionId\": \"%@\", \"notificationId\": \"%@\"}", user, connectionId, notificationId];
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:response];
             [pluginResult setKeepCallbackAsBool:YES];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
@@ -570,7 +570,7 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
     } else if ([response isEqualToString:@"reject"]) {
         for (id callbackId in callbackIds[@"reject"]) {
             CDVPluginResult* pluginResult = nil;
-            NSString *response = [NSString stringWithFormat:@"{response: 'reject event called successfully', user: '%@', connectionId: '%@', notificationId: '%@'}", user, connectionId, notificationId];
+            NSString *response = [NSString stringWithFormat:@"{\"response\": \"reject event called successfully\", \"user\": \"%@\", \"connectionId\": \"%@\", \"notificationId\": \"%@\"}", user, connectionId, notificationId];
             pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:response];
             [pluginResult setKeepCallbackAsBool:YES];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
