@@ -11,6 +11,9 @@ NSString* appName;
 NSString* ringtone;
 NSString* icon;
 BOOL includeInRecents = YES;
+NSString* user;
+NSString* connectionId;
+NSString* notificationId;
 NSMutableDictionary<NSString*, NSMutableArray*> *callbackIds;
 NSDictionary* pendingCallFromRecents;
 BOOL monitorAudioRouteChange = NO;
@@ -663,7 +666,11 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
         hasVideo = NO;
     }
     
-    NSArray* args = [NSArray arrayWithObjects:[caller valueForKey:@"Username"], [caller valueForKey:@"ConnectionId"], nil];
+    user = [caller valueForKey:@"Username"];
+    connectionId = [caller valueForKey:@"ConnectionId"];
+    notificationId = [caller valueForKey:@"NotificationId"];
+    
+    NSArray* args = [NSArray arrayWithObjects:[caller valueForKey:@"Username"], [caller valueForKey:@"ConnectionId"], [caller valueForKey:@"NotificationId"], nil];
     CDVInvokedUrlCommand* newCommand = [[CDVInvokedUrlCommand alloc] initWithArguments:args callbackId:@"" className:self.VoIPPushClassName methodName:self.VoIPPushMethodName];
     
     [self receiveCall:newCommand];
