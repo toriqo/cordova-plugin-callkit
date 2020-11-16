@@ -550,7 +550,7 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
                 [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
             }
         } else {
-            NSString *post = [NSString stringWithFormat:@"{\"notificationId\": \"%@\", \"senderUsername\": \"%@\", \"receiverUsername\": \"%@\", \"username\": \"%@\", \"password\": \"%@\"}", notificationId, connectionId, receiverId, apiUsername, apiPassword];
+            NSString *post = [NSString stringWithFormat:@"{\"notificationId\": \"%@\", \"senderUsername\": \"%@\", \"receiverUsername\": \"%@\", \"username\": \"%@\", \"password\": \"%@\"}", notificationId, receiverId, connectionId, apiUsername, apiPassword];
             NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
             NSString *postLength = [NSString stringWithFormat:@"%lu", (unsigned long)[postData length]];
             NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
