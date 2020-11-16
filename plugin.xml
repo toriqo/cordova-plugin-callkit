@@ -26,11 +26,6 @@
 		<hook type="after_plugin_install" src="hooks/google_services_cleanup.js" />
 
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
-			<meta-data android:name="com.pushwoosh.log_level" android:value="$LOG_LEVEL" />
-			<meta-data android:name="com.pushwoosh.foreground_push" android:value="$ANDROID_FOREGROUND_PUSH" />
-			<meta-data android:name="com.pushwoosh.notification_service_extension" android:value="com.dmarc.cordovacall.PushwooshNotificationServiceExtension" />
-			<meta-data android:name="com.pushwoosh.internal.plugin_provider" android:value="com.dmarc.internal.PhonegapPluginProvider" />
-            
             <service android:name="com.dmarc.cordovacall.MyConnectionService"
                     android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE">
                 <intent-filter>
@@ -57,8 +52,6 @@
 
 		<source-file src="src/android/pushnotifications/InboxUiStyleManager.java" target-dir="src/com/dmarc/cordovacall" />
 
-		<source-file src="src/android/pushnotifications/PushwooshNotificationServiceExtension.java" target-dir="src/com/dmarc/cordovacall" />
-
 		<source-file src="src/android/internal/PhonegapPluginProvider.java" target-dir="src/com/dmarc/internal" />
 
 		<framework src="com.google.firebase:firebase-core:16.0.4" />
@@ -71,11 +64,6 @@
 		<framework src="com.android.support.constraint:constraint-layout:1.0.2" />
 		<framework src="com.github.bumptech.glide:glide:4.7.1" />
 		<framework src="org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.60" />
-		<framework src="com.pushwoosh:pushwoosh:5.17.2"/>
-		<framework src="com.pushwoosh:pushwoosh-amazon:5.17.2"/>
-		<framework src="com.pushwoosh:pushwoosh-badge:5.17.2"/>
-		<framework src="com.pushwoosh:pushwoosh-inbox:5.17.2"/>
-		<framework src="com.pushwoosh:pushwoosh-inbox-ui:5.17.2"/>
 		<framework src="src/android/googleservices-build.gradle" custom="true" type="gradleReference" />
     </platform>
 
