@@ -42,8 +42,6 @@
         <source-file src="src/android/CordovaCall.java" target-dir="src/com/dmarc/cordovacall" />
         <source-file src="src/android/MyConnectionService.java" target-dir="src/com/dmarc/cordovacall" />
 
-		<source-file src="src/android/internal/PhonegapPluginProvider.java" target-dir="src/com/dmarc/internal" />
-
 		<framework src="com.google.firebase:firebase-core:16.0.4" />
 		<framework src="com.google.firebase:firebase-messaging:17.3.4" />
 
