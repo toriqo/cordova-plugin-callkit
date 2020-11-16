@@ -12,10 +12,6 @@
         <clobbers target="cordova.plugins.CordovaCall" />
     </js-module>
 
-    <js-module src="www/PushNotification.js" name="PushNotification">
-		<clobbers target="PushNotification" />
-	</js-module>
-
     <platform name="android">
 
 	    <preference name="LOG_LEVEL" default="DEBUG" />
@@ -45,8 +41,6 @@
 
         <source-file src="src/android/CordovaCall.java" target-dir="src/com/dmarc/cordovacall" />
         <source-file src="src/android/MyConnectionService.java" target-dir="src/com/dmarc/cordovacall" />
-
-		<source-file src="src/android/pushnotifications/InboxUiStyleManager.java" target-dir="src/com/dmarc/cordovacall" />
 
 		<source-file src="src/android/internal/PhonegapPluginProvider.java" target-dir="src/com/dmarc/internal" />
 
