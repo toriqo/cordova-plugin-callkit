@@ -10,9 +10,9 @@ BOOL hasVideo = YES;
 NSString* appName;
 NSString* ringtone;
 NSString* icon;
-NSString* apiUrl = @"apiUrl";
-NSString* apiUsername = @"apiUsername";
-NSString* apiPassword = @"apiPassword";
+NSString* apiUrl;
+NSString* apiUsername;
+NSString* apiPassword;
 BOOL includeInRecents = YES;
 NSString* user;
 NSString* connectionId;
@@ -33,6 +33,10 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
 
 - (void)pluginInitialize
 {
+    apiUrl = [[self.commandDelegate settings] objectForKey:@"api_url"];
+    apiUsername = [[self.commandDelegate settings] objectForKey:@"api_username"];
+    apiPassword = [[self.commandDelegate settings] objectForKey:@"api_password"];
+    
     CXProviderConfiguration *providerConfiguration;
     appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
     providerConfiguration = [[CXProviderConfiguration alloc] initWithLocalizedName:appName];
