@@ -554,33 +554,35 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
                 [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
             }
         } else {
-            NSString *post = [NSString stringWithFormat:@"{\"notificationId\": \"%@\", \"senderUsername\": \"%@\", \"receiverUsername\": \"%@\", \"username\": \"%@\", \"password\": \"%@\"}", notificationId, receiverId, connectionId, apiUsername, apiPassword];
-            NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-            NSString *postLength = [NSString stringWithFormat:@"%lu", (unsigned long)[postData length]];
-            NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
-            [request setURL:[NSURL URLWithString:apiUrl]];
-            [request setHTTPMethod:@"POST"];
-            [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
-            [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-            [request setHTTPBody:postData];
-            
-            NSURLSessionConfiguration* sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
-            
-            /* Create session, and optionally set a NSURLSessionDelegate. */
-            NSURLSession* session = [NSURLSession sessionWithConfiguration:sessionConfig delegate:nil delegateQueue:nil];
-            
-            /* Start a new Task */
-            NSURLSessionDataTask* task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-                if (error == nil) {
-                    // Success
-                    NSLog(@"URL Session Task Succeeded: HTTP %ld", ((NSHTTPURLResponse*)response).statusCode);
-                }
-                else {
-                    // Failure
-                    NSLog(@"URL Session Task Failed: %@", [error localizedDescription]);
-                }
-            }];
-            [task resume];
+            if (nil != user) {
+                NSString *post = [NSString stringWithFormat:@"{\"notificationId\": \"%@\", \"senderUsername\": \"%@\", \"receiverUsername\": \"%@\", \"username\": \"%@\", \"password\": \"%@\"}", notificationId, receiverId, connectionId, apiUsername, apiPassword];
+                NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+                NSString *postLength = [NSString stringWithFormat:@"%lu", (unsigned long)[postData length]];
+                NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
+                [request setURL:[NSURL URLWithString:apiUrl]];
+                [request setHTTPMethod:@"POST"];
+                [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
+                [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+                [request setHTTPBody:postData];
+                
+                NSURLSessionConfiguration* sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
+                
+                /* Create session, and optionally set a NSURLSessionDelegate. */
+                NSURLSession* session = [NSURLSession sessionWithConfiguration:sessionConfig delegate:nil delegateQueue:nil];
+                
+                /* Start a new Task */
+                NSURLSessionDataTask* task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                    if (error == nil) {
+                        // Success
+                        NSLog(@"URL Session Task Succeeded: HTTP %ld", ((NSHTTPURLResponse*)response).statusCode);
+                    }
+                    else {
+                        // Failure
+                        NSLog(@"URL Session Task Failed: %@", [error localizedDescription]);
+                    }
+                }];
+                [task resume];
+            }
             
             if ([callbackIds[@"reject"] count] == 0) {
                 // callbackId for event not registered, add to pending to trigger on registration
@@ -607,8 +609,14 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
     } else if ([response isEqualToString:@"reject"]) {
         for (id callbackId in callbackIds[@"reject"]) {
             CDVPluginResult* pluginResult = nil;
-            NSDictionary *response = @{@"response": @"reject event called successfully", @"user": user, @"connectionId": connectionId, @"notificationId": notificationId};
-            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:response];
+            
+            if (nil != user) {
+                NSDictionary *response = @{@"response": @"reject event called successfully", @"user": user, @"connectionId": connectionId, @"notificationId": notificationId};
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:response];
+            } else {
+                NSString *response = @"reject event called successfully";
+                pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:response];
+            }
             [pluginResult setKeepCallbackAsBool:YES];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
         }
