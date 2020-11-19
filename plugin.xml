@@ -85,6 +85,13 @@
             <string>production</string>
         </config-file>
 
+    	<config-file target="*-Info.plist" parent="NSUserActivityTypes">
+	      <array>
+	        <string>INStartAudioCallIntent</string>
+	        <string>INStartVideoCallIntent</string>
+	      </array>
+	    </config-file>
+
         <header-file src="src/ios/CordovaCall.h"/>
 
         <source-file src="src/ios/CordovaCall.m"/>
