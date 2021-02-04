@@ -66,7 +66,8 @@
                 <param name="onload" value="true"/>
             </feature>
 
-            <preference name="API_URL" value="$API_URL"/>
+            <preference name="API_URL_CALL" value="$API_URL_CALL"/>
+            <preference name="API_URL_RING" value="$API_URL_RING"/>
             <preference name="API_USERNAME" value="$API_USERNAME"/>
             <preference name="API_PASSWORD" value="$API_PASSWORD"/>
         </config-file>
