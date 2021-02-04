@@ -9,8 +9,9 @@
 BOOL hasVideo = YES;
 NSString* appName;
 NSString* ringtone;
-NSString* icon;
-NSString* apiUrl;
+NSString* icon = @"raluz";
+NSString* apiUrlCall;
+NSString* apiUrlRing;
 NSString* apiUsername;
 NSString* apiPassword;
 BOOL includeInRecents = YES;
@@ -33,7 +34,8 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
 
 - (void)pluginInitialize
 {
-    apiUrl = [[self.commandDelegate settings] objectForKey:@"api_url"];
+    apiUrlCall = [[self.commandDelegate settings] objectForKey:@"api_url_call"];
+    apiUrlRing = [[self.commandDelegate settings] objectForKey:@"api_url_ring"];
     apiUsername = [[self.commandDelegate settings] objectForKey:@"api_username"];
     apiPassword = [[self.commandDelegate settings] objectForKey:@"api_password"];
     
@@ -97,6 +99,7 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
     if(ringtone != nil) {
         providerConfiguration.ringtoneSound = ringtone;
     }
+    
     if(icon != nil) {
         UIImage *iconImage = [UIImage imageNamed:icon];
         NSData *iconData = UIImagePNGRepresentation(iconImage);
@@ -559,7 +562,7 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
                 NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
                 NSString *postLength = [NSString stringWithFormat:@"%lu", (unsigned long)[postData length]];
                 NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
-                [request setURL:[NSURL URLWithString:apiUrl]];
+                [request setURL:[NSURL URLWithString:apiUrlCall]];
                 [request setHTTPMethod:@"POST"];
                 [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
                 [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
