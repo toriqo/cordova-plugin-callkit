@@ -237,6 +237,33 @@ NSString* const KEY_VOIP_PUSH_TOKEN = @"PK_deviceToken";
         if (!isRinging) {
             [self.provider reportNewIncomingCallWithUUID:callUUID update:callUpdate completion:^(NSError * _Nullable error) {
                 if(error == nil) {
+                    NSString *post = [NSString stringWithFormat:@"{\"senderUsername\": \"%@\", \"receiverUsername\": \"%@\", \"username\": \"%@\", \"password\": \"%@\"}", receiverId, connectionId, apiUsername, apiPassword];
+                    NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+                    NSString *postLength = [NSString stringWithFormat:@"%lu", (unsigned long)[postData length]];
+                    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
+                    [request setURL:[NSURL URLWithString:apiUrlRing]];
+                    [request setHTTPMethod:@"POST"];
+                    [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
+                    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+                    [request setHTTPBody:postData];
+                    
+                    NSURLSessionConfiguration* sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
+                    
+                    /* Create session, and optionally set a NSURLSessionDelegate. */
+                    NSURLSession* session = [NSURLSession sessionWithConfiguration:sessionConfig delegate:nil delegateQueue:nil];
+                    
+                    /* Start a new Task */
+                    NSURLSessionDataTask* task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                        if (error == nil) {
+                            // Success
+                            NSLog(@"URL Session Task Succeeded: HTTP %ld", ((NSHTTPURLResponse*)response).statusCode);
+                        }
+                        else {
+                            // Failure
+                            NSLog(@"URL Session Task Failed: %@", [error localizedDescription]);
+                        }
+                    }];
+                    [task resume];
                     isRinging = YES;
                     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Incoming call successful"] callbackId:command.callbackId];
                 } else {
