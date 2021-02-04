@@ -4,7 +4,8 @@
         xmlns:android="http://schemas.android.com/apk/res/android">
     <name>Cordova CallKit</name>
 
-    <preference name="API_URL"/>
+    <preference name="API_URL_CALL"/>
+    <preference name="API_URL_RING"/>
     <preference name="API_USERNAME"/>
     <preference name="API_PASSWORD"/>
 
